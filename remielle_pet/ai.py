@@ -67,7 +67,7 @@ class AIClient:
             and str(self.config.get("model", "")).strip()
         )
 
-    def system_prompt(self) -> str:
+    def system_prompt(self, current_message: str = "") -> str:
         owner_name = str(self.config.get("owner_name", "绳匠")).strip() or "绳匠"
         style_name = str(self.config.get("personality_style", "神秘共犯"))
         style = PERSONALITY_PRESETS.get(style_name, PERSONALITY_PRESETS["神秘共犯"])
@@ -81,6 +81,11 @@ class AIClient:
             sections.append(f"【性格补充】{custom}")
         if self.config.get("memory_enabled", True) and self.memory:
             sections.append(self.memory.prompt_context())
+            preview = self.memory.emotion_for_message(current_message)
+            if preview["key"] != "calm":
+                sections.append(
+                    f"【本轮即时反馈】用户当前表达更适合“{preview['label']}”状态：{preview['guidance']}"
+                )
         return "\n\n".join(sections)
 
     def reply(self, messages: list[dict]) -> str:
@@ -96,7 +101,13 @@ class AIClient:
         payload = json.dumps(
             {
                 "model": model,
-                "messages": [{"role": "system", "content": self.system_prompt()}, *messages[-12:]],
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": self.system_prompt(str(messages[-1].get("content", ""))),
+                    },
+                    *messages[-12:],
+                ],
                 "temperature": 0.85,
                 "max_completion_tokens": 180,
             },

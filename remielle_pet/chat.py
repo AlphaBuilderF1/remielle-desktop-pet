@@ -60,7 +60,14 @@ class ChatWindow:
             fg="#f7d9ff",
             font=("Microsoft YaHei UI", 14, "bold"),
         ).pack(anchor="w")
-        self.status_label = tk.Label(identity, bg="#252033", fg="#a99db8", font=("Microsoft YaHei UI", 8))
+        self.status_label = tk.Label(
+            identity,
+            bg="#252033",
+            fg="#a99db8",
+            font=("Microsoft YaHei UI", 8),
+            justify="left",
+            wraplength=300,
+        )
         self.status_label.pack(anchor="w", pady=(2, 0))
         self.refresh_status()
         tk.Button(
@@ -117,7 +124,12 @@ class ChatWindow:
 
     def refresh_status(self) -> None:
         if self.status_label and self.status_label.winfo_exists():
-            self.status_label.configure(text=self.app.ai.mode_label())
+            status = self.app.ai.mode_label()
+            if self.app.config.get("memory_enabled", True):
+                emotion = self.app.memory.emotion()
+                relation = self.app.memory.relationship()
+                status += f" · {emotion['symbol']} {emotion['label']} · {relation['stage']}"
+            self.status_label.configure(text=status)
 
     def _append(self, name: str, text: str, who: str) -> None:
         if not self.transcript:
@@ -174,15 +186,16 @@ class ChatWindow:
 
         if status == "ok":
             self.history.append({"role": "assistant", "content": result})
+            self._remember_turn(result)
             self._append("蕾米埃尔", result, "pet")
             self.app.show_bubble(result, 6500)
-            self._remember_turn(result)
         else:
             self._append("系统", f"{result}\n本条消息已改用离线回复，你的 AI 设置没有被自动修改。", "pet")
             fallback = offline_reply(self.history[-1]["content"], self.app.config.get("owner_name", "绳匠"))
             self.history.append({"role": "assistant", "content": fallback})
-            self._append("蕾米埃尔", fallback, "pet")
             self._remember_turn(fallback)
+            self._append("蕾米埃尔", fallback, "pet")
+            self.app.show_bubble(fallback, 6500)
         if self.send_button:
             self.send_button.configure(state="normal", text="发送")
         if self.input_box:
@@ -195,6 +208,7 @@ class ChatWindow:
         user_message = str(self.history[-2].get("content", ""))
         try:
             self.app.memory.record_turn(user_message, answer)
+            self.app.refresh_emotional_feedback()
         except OSError:
             self._append("系统", "本轮对话正常完成，但记忆文件暂时无法写入。", "pet")
 

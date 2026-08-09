@@ -102,6 +102,8 @@ class MemoryPersonalityWindow:
             bg="#eee5f3",
             fg="#624c70",
             anchor="w",
+            justify="left",
+            wraplength=540,
             padx=12,
             pady=8,
             font=("Microsoft YaHei UI", 9, "bold"),
@@ -230,10 +232,12 @@ class MemoryPersonalityWindow:
                 self.memory_list.insert("end", "还没有长期记忆。")
         if self.relation_label and self.relation_label.winfo_exists():
             relation = self.app.memory.relationship()
+            emotion = self.app.memory.emotion()
             self.relation_label.configure(
                 text=(
-                    f"关系：{relation['stage']} · 相识第 {relation['days_together']} 天 · "
-                    f"{relation.get('interaction_count', 0)} 轮对话 · {len(memories)} 条长期记忆"
+                    f"{emotion['symbol']} {emotion['label']} · 关系：{relation['stage']} · "
+                    f"相识第 {relation['days_together']} 天 · {relation.get('interaction_count', 0)} 轮对话 · "
+                    f"{len(memories)} 条长期记忆"
                 )
             )
 

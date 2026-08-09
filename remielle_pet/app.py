@@ -13,7 +13,7 @@ from collections import deque
 from .ai import AIClient
 from .chat import ChatWindow
 from .config import load_config
-from .constants import ANIMATION_ASSETS, ASSET_PATH, IDLE_LINES, TRANSPARENT_COLOR
+from .constants import ANIMATION_ASSETS, ASSET_PATH, EMOTIONAL_IDLE_LINES, IDLE_LINES, TRANSPARENT_COLOR
 from .memory import MemoryStore
 from .memory_ui import MemoryPersonalityWindow
 from .settings import SettingsWindow
@@ -85,6 +85,14 @@ class DesktopPet:
             justify="center",
             state="hidden",
         )
+        self.emotion_badge = self.canvas.create_text(
+            51,
+            31,
+            text="✦",
+            fill="#a977c7",
+            font=("Segoe UI Symbol", 12, "bold"),
+            state="hidden",
+        )
         self.bubble_after: str | None = None
         self.drag_start = (0, 0)
         self.drag_origin = (0, 0)
@@ -112,11 +120,15 @@ class DesktopPet:
         self.root.after(30, self._animate)
         owner_name = str(self.config.get("owner_name", "绳匠"))
         relation = self.memory.relationship()
-        greeting = (
-            f"欢迎回来，{owner_name}。我还记得我们的约定。"
-            if self.config.get("memory_enabled", True) and relation.get("interaction_count", 0)
-            else f"你好呀，{owner_name}。今后就请多关照了。"
-        )
+        emotion = self.memory.emotion()
+        if not self.config.get("memory_enabled", True) or not relation.get("interaction_count", 0):
+            greeting = f"你好呀，{owner_name}。今后就请多关照了。"
+        elif emotion["key"] in ("concerned", "tired"):
+            greeting = f"欢迎回来，{owner_name}。今天也不用太勉强自己。"
+        elif relation["stage"] == "默契共犯":
+            greeting = f"欢迎回来，共犯。我就知道你会再来。"
+        else:
+            greeting = f"欢迎回来，{owner_name}。我还记得我们的约定。"
         self.root.after(1000, lambda: self.show_bubble(greeting, 6000))
         self.root.after(1600, self.prefetch_speech)
         self.root.after(150000, self._idle_talk)
@@ -259,9 +271,17 @@ class DesktopPet:
         short = text.strip()
         if len(short) > 90:
             short = short[:87] + "…"
+        emotion = self.memory.emotion()
         self.canvas.itemconfigure(self.bubble_text, text=short, state="normal")
-        self.canvas.itemconfigure(self.bubble_bg, state="normal")
+        self.canvas.itemconfigure(self.bubble_bg, outline=emotion["color"], state="normal")
+        self.canvas.itemconfigure(
+            self.emotion_badge,
+            text=emotion["symbol"],
+            fill=emotion["color"],
+            state="normal",
+        )
         self.canvas.tag_raise(self.bubble_bg)
+        self.canvas.tag_raise(self.emotion_badge)
         self.canvas.tag_raise(self.bubble_text)
         if self.bubble_after:
             self.root.after_cancel(self.bubble_after)
@@ -270,6 +290,7 @@ class DesktopPet:
     def hide_bubble(self) -> None:
         self.canvas.itemconfigure(self.bubble_text, state="hidden")
         self.canvas.itemconfigure(self.bubble_bg, state="hidden")
+        self.canvas.itemconfigure(self.emotion_badge, state="hidden")
         self.bubble_after = None
 
     def _idle_talk(self) -> None:
@@ -278,7 +299,9 @@ class DesktopPet:
 
     def speak(self) -> None:
         if not self.ai.is_ready():
-            self.show_bubble(random.choice(IDLE_LINES), 5500)
+            emotion_key = str(self.memory.emotion().get("key", "calm"))
+            lines = EMOTIONAL_IDLE_LINES.get(emotion_key, IDLE_LINES)
+            self.show_bubble(random.choice(lines), 5500)
             return
         if self.speech_cache:
             self.show_bubble(self.speech_cache.popleft(), 6500)
@@ -391,6 +414,11 @@ class DesktopPet:
 
     def open_memory_personality(self) -> None:
         self.memory_personality.show()
+
+    def refresh_emotional_feedback(self) -> None:
+        self.chat.refresh_status()
+        if self.memory_personality.window and self.memory_personality.window.winfo_exists():
+            self.memory_personality.refresh_memories()
 
     def run(self) -> None:
         self.root.mainloop()

@@ -1,7 +1,9 @@
 """蕾米埃尔桌面宠物启动入口。"""
 
+import json
 import sys
 import tempfile
+from datetime import datetime, timedelta
 from pathlib import Path
 
 from remielle_pet.ai import AIClient, offline_reply
@@ -43,10 +45,26 @@ def self_test() -> None:
         assert "用户喜欢咖啡" in memory.prompt_context()
         assert memory.record_turn("你喜欢咖啡吗？", "当然。") == []
         assert memory.record_turn("我喜欢咖啡吗？", "你说呢？") == []
+        memory.record_turn("今天压力很大", "先休息一下吧。")
+        assert memory.emotion()["key"] == "concerned"
+        assert memory.relationship()["stage"] == "逐渐熟悉"
         test_config = dict(DEFAULT_CONFIG)
         test_config["custom_personality"] = "说话更俏皮一些"
         prompt = AIClient(test_config, memory).system_prompt()
         assert "神秘共犯" in prompt and "用户喜欢咖啡" in prompt and "说话更俏皮一些" in prompt
+        assert "当前情绪反馈" in prompt and "关心" in prompt
+        assert "本轮即时反馈" in AIClient(test_config, memory).system_prompt("我今天好难过")
+        memory.data["emotion"]["updated_at"] = (datetime.now().astimezone() - timedelta(hours=7)).isoformat()
+        assert memory.emotion()["key"] == "calm"
+
+        legacy_path = Path(temp_dir) / "legacy-memory.json"
+        legacy_path.write_text(
+            json.dumps({"version": 1, "relationship": {"interaction_count": 6}}),
+            encoding="utf-8",
+        )
+        migrated = MemoryStore(legacy_path)
+        assert migrated.relationship()["affinity"] == 12
+        assert migrated.emotion()["key"] == "calm"
     print("Self-test passed")
 
 
