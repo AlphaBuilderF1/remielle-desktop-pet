@@ -14,6 +14,8 @@ from .ai import AIClient
 from .chat import ChatWindow
 from .config import load_config
 from .constants import ANIMATION_ASSETS, ASSET_PATH, IDLE_LINES, TRANSPARENT_COLOR
+from .memory import MemoryStore
+from .memory_ui import MemoryPersonalityWindow
 from .settings import SettingsWindow
 
 
@@ -32,7 +34,8 @@ class DesktopPet:
             raise FileNotFoundError(f"找不到角色素材：{ASSET_PATH}")
 
         self.config = load_config()
-        self.ai = AIClient(self.config)
+        self.memory = MemoryStore()
+        self.ai = AIClient(self.config, self.memory)
         self.root = tk.Tk()
         self.root.title("蕾米埃尔桌宠")
         self.root.overrideredirect(True)
@@ -102,11 +105,19 @@ class DesktopPet:
 
         self.chat = ChatWindow(self)
         self.settings = SettingsWindow(self)
+        self.memory_personality = MemoryPersonalityWindow(self)
         self._bind_events()
         self._build_menu()
 
         self.root.after(30, self._animate)
-        self.root.after(1000, lambda: self.show_bubble("你好呀，绳匠。今后就请多关照了。", 6000))
+        owner_name = str(self.config.get("owner_name", "绳匠"))
+        relation = self.memory.relationship()
+        greeting = (
+            f"欢迎回来，{owner_name}。我还记得我们的约定。"
+            if self.config.get("memory_enabled", True) and relation.get("interaction_count", 0)
+            else f"你好呀，{owner_name}。今后就请多关照了。"
+        )
+        self.root.after(1000, lambda: self.show_bubble(greeting, 6000))
         self.root.after(1600, self.prefetch_speech)
         self.root.after(150000, self._idle_talk)
 
@@ -120,6 +131,7 @@ class DesktopPet:
     def _build_menu(self) -> None:
         self.menu = tk.Menu(self.root, tearoff=False)
         self.menu.add_command(label="和她聊天", command=self.chat.show)
+        self.menu.add_command(label="记忆与性格", command=self.open_memory_personality)
         self.menu.add_command(label="设置 AI", command=self.open_settings)
         self.menu.add_separator()
         self.menu.add_command(label="退出", command=self.root.destroy)
@@ -376,6 +388,9 @@ class DesktopPet:
 
     def open_settings(self) -> None:
         self.settings.show()
+
+    def open_memory_personality(self) -> None:
+        self.memory_personality.show()
 
     def run(self) -> None:
         self.root.mainloop()

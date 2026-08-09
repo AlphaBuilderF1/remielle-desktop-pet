@@ -6,7 +6,8 @@ import random
 import urllib.error
 import urllib.request
 
-from .constants import SYSTEM_PROMPT
+from .constants import PERSONALITY_PRESETS, SYSTEM_PROMPT
+from .memory import MemoryStore
 from .security import unprotect_api_key
 
 
@@ -39,8 +40,9 @@ def offline_reply(message: str, owner_name: str) -> str:
 
 
 class AIClient:
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, memory: MemoryStore | None = None):
         self.config = config
+        self.memory = memory
         try:
             self.session_key = unprotect_api_key(str(config.get("encrypted_api_key", "")))
         except OSError:
@@ -65,6 +67,22 @@ class AIClient:
             and str(self.config.get("model", "")).strip()
         )
 
+    def system_prompt(self) -> str:
+        owner_name = str(self.config.get("owner_name", "绳匠")).strip() or "绳匠"
+        style_name = str(self.config.get("personality_style", "神秘共犯"))
+        style = PERSONALITY_PRESETS.get(style_name, PERSONALITY_PRESETS["神秘共犯"])
+        custom = str(self.config.get("custom_personality", "")).strip()[:300]
+        sections = [
+            SYSTEM_PROMPT,
+            f"【称呼】用户希望被称为“{owner_name}”。",
+            f"【当前性格：{style_name}】{style}",
+        ]
+        if custom:
+            sections.append(f"【性格补充】{custom}")
+        if self.config.get("memory_enabled", True) and self.memory:
+            sections.append(self.memory.prompt_context())
+        return "\n\n".join(sections)
+
     def reply(self, messages: list[dict]) -> str:
         key = self.get_api_key()
         if not self.config.get("use_ai") or not key:
@@ -78,7 +96,7 @@ class AIClient:
         payload = json.dumps(
             {
                 "model": model,
-                "messages": [{"role": "system", "content": SYSTEM_PROMPT}, *messages[-12:]],
+                "messages": [{"role": "system", "content": self.system_prompt()}, *messages[-12:]],
                 "temperature": 0.85,
                 "max_completion_tokens": 180,
             },

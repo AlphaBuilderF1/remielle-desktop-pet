@@ -16,7 +16,9 @@ class ChatWindow:
     def __init__(self, app: DesktopPet):
         self.app = app
         self.window: tk.Toplevel | None = None
-        self.history: list[dict] = []
+        self.history: list[dict] = (
+            app.memory.recent_messages(limit=8) if app.config.get("memory_enabled", True) else []
+        )
         self.result_queue: queue.Queue[tuple[str, str]] = queue.Queue()
         self.input_box: tk.Entry | None = None
         self.transcript: tk.Text | None = None
@@ -133,6 +135,21 @@ class ChatWindow:
         if not message:
             return "break"
         self.input_box.delete(0, "end")
+        if message == "/记忆":
+            self.app.open_memory_personality()
+            return "break"
+        if message.startswith("/记住 "):
+            if not self.app.config.get("memory_enabled", True):
+                self._append("蕾米埃尔", "记忆功能现在是关闭的，可以先在“记忆与性格”中开启。", "pet")
+                return "break"
+            content = message.removeprefix("/记住 ").strip()
+            try:
+                stored = self.app.memory.remember(content, category="明确记忆")
+            except OSError as exc:
+                self._append("系统", f"记忆保存失败：{exc}", "pet")
+                return "break"
+            self._append("蕾米埃尔", "记住了。" if stored else "这件事我已经记得了。", "pet")
+            return "break"
         self._append(self.app.config.get("owner_name", "你"), message, "user")
         self.history.append({"role": "user", "content": message})
         self.send_button.configure(state="disabled", text="思考中…")
@@ -159,13 +176,27 @@ class ChatWindow:
             self.history.append({"role": "assistant", "content": result})
             self._append("蕾米埃尔", result, "pet")
             self.app.show_bubble(result, 6500)
+            self._remember_turn(result)
         else:
             self._append("系统", f"{result}\n本条消息已改用离线回复，你的 AI 设置没有被自动修改。", "pet")
             fallback = offline_reply(self.history[-1]["content"], self.app.config.get("owner_name", "绳匠"))
             self.history.append({"role": "assistant", "content": fallback})
             self._append("蕾米埃尔", fallback, "pet")
+            self._remember_turn(fallback)
         if self.send_button:
             self.send_button.configure(state="normal", text="发送")
         if self.input_box:
             self.input_box.focus_set()
         self.window.after(120, self._poll_result)
+
+    def _remember_turn(self, answer: str) -> None:
+        if not self.app.config.get("memory_enabled", True) or len(self.history) < 2:
+            return
+        user_message = str(self.history[-2].get("content", ""))
+        try:
+            self.app.memory.record_turn(user_message, answer)
+        except OSError:
+            self._append("系统", "本轮对话正常完成，但记忆文件暂时无法写入。", "pet")
+
+    def reset_context(self) -> None:
+        self.history.clear()

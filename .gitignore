@@ -1,5 +1,7 @@
 __pycache__/
 *.pyc
 config.json
+memory.json
+memory.json.tmp
 archive/
 tmp/
