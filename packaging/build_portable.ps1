@@ -62,6 +62,9 @@ New-Item -ItemType Directory -Path $PackageDir -Force | Out-Null
 $BuiltAppDir = Join-Path $DistDir $AppName
 Get-ChildItem -LiteralPath $BuiltAppDir -Force | Copy-Item -Destination $PackageDir -Recurse
 Copy-Item -LiteralPath (Join-Path $ProjectDir "packaging\portable_readme.txt") -Destination (Join-Path $PackageDir $ReadmeName)
+Copy-Item -LiteralPath (Join-Path $ProjectDir "LICENSE") -Destination (Join-Path $PackageDir "LICENSE.txt")
+Copy-Item -LiteralPath (Join-Path $ProjectDir "RIGHTS.md") -Destination $PackageDir
+Copy-Item -LiteralPath (Join-Path $ProjectDir "PRIVACY.md") -Destination $PackageDir
 
 if (Test-Path -LiteralPath $ZipPath) { Remove-Item -LiteralPath $ZipPath -Force }
 if (Test-Path -LiteralPath $HashPath) { Remove-Item -LiteralPath $HashPath -Force }
