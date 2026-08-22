@@ -3,19 +3,30 @@
 import json
 import sys
 import tempfile
+import traceback
 from datetime import datetime, timedelta
 from pathlib import Path
+from tkinter import messagebox
 
 from remielle_pet.ai import AIClient, offline_reply
 from remielle_pet.app import DesktopPet
 from remielle_pet.config import load_config, save_config
-from remielle_pet.constants import ANIMATION_ASSETS, ASSET_PATH, CONFIG_PATH, DEFAULT_CONFIG, MEMORY_PATH
+from remielle_pet.constants import (
+    ANIMATION_ASSETS,
+    APP_VERSION,
+    ASSET_PATH,
+    CONFIG_PATH,
+    DATA_DIR,
+    DEFAULT_CONFIG,
+    MEMORY_PATH,
+)
 from remielle_pet.memory import MemoryStore
 from remielle_pet.security import protect_api_key, unprotect_api_key
 
 __all__ = [
     "AIClient",
     "ANIMATION_ASSETS",
+    "APP_VERSION",
     "ASSET_PATH",
     "CONFIG_PATH",
     "DEFAULT_CONFIG",
@@ -68,8 +79,26 @@ def self_test() -> None:
     print("Self-test passed")
 
 
+def report_startup_error(exc: BaseException) -> None:
+    """让无控制台的便携版也能给出可排查的启动错误。"""
+    log_path = DATA_DIR / "启动错误.log"
+    try:
+        log_path.write_text(traceback.format_exc(), encoding="utf-8")
+        detail = f"错误记录已保存到：\n{log_path}"
+    except OSError:
+        detail = "同时无法写入错误记录，请将程序解压到有写入权限的目录。"
+    try:
+        messagebox.showerror("蕾米埃尔桌宠启动失败", f"程序未能正常启动。\n\n{exc}\n\n{detail}")
+    except Exception:
+        pass
+
+
 if __name__ == "__main__":
     if "--self-test" in sys.argv:
         self_test()
     else:
-        DesktopPet().run()
+        try:
+            DesktopPet().run()
+        except Exception as error:
+            report_startup_error(error)
+            raise SystemExit(1) from error

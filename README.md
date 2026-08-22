@@ -4,7 +4,9 @@
 
 ## 开始使用
 
-双击 `启动蕾米埃尔.bat`。启动后：
+普通用户请从 GitHub Releases 下载 `蕾米埃尔桌宠-v0.3.0-Windows-x64.zip`，完整解压后双击 `蕾米埃尔桌宠.exe`，无需安装 Python。
+
+从源码运行时，双击 `启动蕾米埃尔.bat`。启动后：
 
 - 拖动角色可以移动位置。
 - 单击角色会让当前 AI 模型生成一句新台词；未配置 AI 时使用内置台词。
@@ -52,9 +54,26 @@ API 密钥会使用 Windows DPAPI 与当前登录账户绑定加密，再写入�
 
 记忆保存在本机的 `memory.json` 中。该文件和临时写入文件都已加入 `.gitignore`，不会随代码推送到 GitHub。删除记忆后无法恢复。
 
+## 构建 Windows 便携版
+
+构建环境需要 Windows、Python 3.10 或更高版本，以及 PyInstaller：
+
+```powershell
+python -m pip install pyinstaller
+powershell -ExecutionPolicy Bypass -File packaging\build_portable.ps1
+```
+
+脚本会先运行自检，再生成：
+
+- `release/蕾米埃尔桌宠-v0.3.0-Windows-x64.zip`
+- 同名 `.sha256.txt` 校验文件
+
+便携包不包含 `config.json`、`memory.json`、API 密钥或开发文件。用户数据保存在解压后的程序根目录，升级时可以自行保留。
+
 ## 说明
 
-- 运行环境：Windows 10/11，Python 3.10 或更高版本。
+- 便携版运行环境：64 位 Windows 10/11，无需安装 Python。
+- 源码运行环境：Python 3.10 或更高版本。
 - 退出：右键角色，选择“退出”。
 - 设置保存在同目录的 `config.json` 中；API 密钥只以 Windows 账户绑定的加密内容保存，不包含明文密钥。
 - AI 可用时会一次生成并缓存数条主动台词，单击角色可立即显示，缓存不足时会在后台自动补充；没有配置 AI 时使用内置台词。

@@ -1,13 +1,17 @@
+import sys
 from pathlib import Path
 
 
+APP_VERSION = "0.3.0"
 PROJECT_DIR = Path(__file__).resolve().parent.parent
-ASSET_PATH = PROJECT_DIR / "assets" / "remielle-v5-open-hand-five-fingers-display.png"
+RESOURCE_DIR = Path(getattr(sys, "_MEIPASS", PROJECT_DIR))
+DATA_DIR = Path(sys.executable).resolve().parent if getattr(sys, "frozen", False) else PROJECT_DIR
+ASSET_PATH = RESOURCE_DIR / "assets" / "remielle-v5-open-hand-five-fingers-display.png"
 ANIMATION_ASSETS = {
-    "blink": PROJECT_DIR / "assets" / "remielle-anim-blink.png",
+    "blink": RESOURCE_DIR / "assets" / "remielle-anim-blink.png",
 }
-CONFIG_PATH = PROJECT_DIR / "config.json"
-MEMORY_PATH = PROJECT_DIR / "memory.json"
+CONFIG_PATH = DATA_DIR / "config.json"
+MEMORY_PATH = DATA_DIR / "memory.json"
 TRANSPARENT_COLOR = "#010203"
 
 PERSONALITY_PRESETS = {

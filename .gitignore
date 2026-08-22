@@ -5,3 +5,7 @@ memory.json
 memory.json.tmp
 archive/
 tmp/
+build/
+dist/
+release/
+启动错误.log
