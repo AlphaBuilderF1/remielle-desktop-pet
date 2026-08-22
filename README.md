@@ -3,6 +3,8 @@
 
 # 蕾米埃尔 AI 桌面宠物
 
+<a href="https://github.com/AlphaBuilderF1/remielle-desktop-pet/actions/workflows/ci.yml"><img src="https://github.com/AlphaBuilderF1/remielle-desktop-pet/actions/workflows/ci.yml/badge.svg?branch=main" alt="Windows CI"></a>
+
 **会记住你、感知对话氛围，也能完全离线陪伴的 Windows 桌宠。**
 
 [**下载 Windows 便携版**](https://github.com/AlphaBuilderF1/remielle-desktop-pet/releases/download/v0.3.0/RemielleDesktopPet-v0.3.0-Windows-x64.zip)

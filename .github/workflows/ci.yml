@@ -1,0 +1,64 @@
+name: Windows CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: windows-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  self-test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.10"
+          - "3.12"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Show Python version
+        run: python --version
+
+      - name: Compile Python sources
+        run: python -m compileall -q main.py remielle_pet
+
+      - name: Run project self-test
+        run: python main.py --self-test
+
+      - name: Check release version consistency
+        shell: pwsh
+        run: |
+          $version = python -c "from remielle_pet.constants import APP_VERSION; print(APP_VERSION)"
+          $checks = @(
+            @{ Path = "packaging/build_portable.ps1"; Pattern = "Version = `"$version`"" },
+            @{ Path = "packaging/version_info.txt"; Pattern = "FileVersion', '$version'" },
+            @{ Path = "packaging/version_info.txt"; Pattern = "ProductVersion', '$version'" },
+            @{ Path = "packaging/portable_readme.txt"; Pattern = "v$version" },
+            @{ Path = "README.md"; Pattern = "v$version" }
+          )
+
+          foreach ($check in $checks) {
+            if (-not (Select-String -LiteralPath $check.Path -SimpleMatch $check.Pattern -Quiet)) {
+              throw "Version $version is missing from $($check.Path): $($check.Pattern)"
+            }
+          }
+
+          Write-Host "Release version is consistent: $version"
