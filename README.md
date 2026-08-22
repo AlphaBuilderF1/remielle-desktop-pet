@@ -1,93 +1,122 @@
+<div align="center">
+  <img src="assets/remielle-v5-open-hand-five-fingers-display.png" width="300" alt="蕾米埃尔 AI 桌面宠物">
+
 # 蕾米埃尔 AI 桌面宠物
 
-一个以《绝区零》蕾米埃尔·丹为灵感制作的非官方 Q 版桌面宠物原型，仅供个人学习与娱乐。
+**会记住你、感知对话氛围，也能完全离线陪伴的 Windows 桌宠。**
 
-> 本项目与《绝区零》的开发商、发行商及其关联方无关。源代码使用 MIT License，角色、名称和美术素材不在该许可范围内。详见《[开源与权利说明](RIGHTS.md)》和《[隐私说明](PRIVACY.md)》。
+[**下载 Windows 便携版**](https://github.com/AlphaBuilderF1/remielle-desktop-pet/releases/download/v0.3.0/RemielleDesktopPet-v0.3.0-Windows-x64.zip)
+· [查看 Release](https://github.com/AlphaBuilderF1/remielle-desktop-pet/releases/tag/v0.3.0)
+· [校验文件](https://github.com/AlphaBuilderF1/remielle-desktop-pet/releases/download/v0.3.0/RemielleDesktopPet-v0.3.0-Windows-x64.zip.sha256.txt)
 
-## 开始使用
+Windows 10/11 x64 · v0.3.0 · 无需安装 Python
+</div>
 
-普通用户请从 GitHub Releases 下载 `蕾米埃尔桌宠-v0.3.0-Windows-x64.zip`，完整解压后双击 `蕾米埃尔桌宠.exe`，无需安装 Python。
+> 本项目是以《绝区零》蕾米埃尔·丹为灵感制作的非官方、非商业同人作品，与原作开发商、发行商及其关联方无关。详见《[开源与权利说明](RIGHTS.md)》。
 
-从源码运行时，双击 `启动蕾米埃尔.bat`。启动后：
+## 核心特点
 
-- 拖动角色可以移动位置。
-- 单击角色会让当前 AI 模型生成一句新台词；未配置 AI 时使用内置台词。
-- 待机时会随机轻晃、小跳或眨眼，单击角色会播放弹性反馈。
-- 动作使用缓入缓出、预备姿势和落地回弹，避免在两张角色帧之间快速闪切。
-- 双击角色打开聊天窗口。
-- 右键角色可聊天、管理记忆与性格、设置 AI 或退出。
+- **离线也能玩**：默认使用内置陪伴台词，不配置 AI 也能拖动、互动、眨眼和播放待机动作。
+- **接入自己的 AI**：支持兼容 `POST /v1/chat/completions` 的接口，可自定义模型、接口地址和称呼。
+- **记忆与性格**：支持长期记忆管理、最近对话、三种性格预设和自定义性格要求。
+- **对话氛围与关系反馈**：在本地识别明确的对话语气，调整状态文字、气泡颜色、台词和回复风格，不进行心理或医学判断。
 
-默认使用内置陪伴台词，不联网也可以玩。
+## 快速开始
+
+1. 下载 [`RemielleDesktopPet-v0.3.0-Windows-x64.zip`](https://github.com/AlphaBuilderF1/remielle-desktop-pet/releases/download/v0.3.0/RemielleDesktopPet-v0.3.0-Windows-x64.zip)。
+2. 完整解压 ZIP，不要直接在压缩包中运行。
+3. 双击 `蕾米埃尔桌宠.exe`。
+4. 如果 Windows 显示“未知发布者”，请确认文件来自本项目 Release，并使用随附的 SHA-256 文件核对完整性。
+
+### 基本操作
+
+| 操作 | 功能 |
+| --- | --- |
+| 拖动角色 | 移动桌宠位置 |
+| 单击角色 | 显示一句新台词 |
+| 双击角色 | 打开聊天窗口 |
+| 右键角色 | 打开聊天、记忆、AI 设置和退出菜单 |
 
 ## 接入 AI
 
-右键角色，选择“设置 AI”：
+1. 右键角色，选择“设置 AI”。
+2. 勾选“启用兼容 AI 接口”。
+3. 填写模型名称、接口地址和 API 密钥。
+4. 点击“保存并测试连接”，然后双击角色开始聊天。
 
-1. 勾选“启用兼容 AI 接口”。
-2. 填写你的账号可用的模型名称。
-3. 输入 API 密钥，点击“保存并测试连接”。
-4. 双击蕾米埃尔，在聊天窗口中发送消息。
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <a href="docs/images/screenshots/ai-settings.png"><img src="docs/images/screenshots/ai-settings.png" alt="AI 对话设置" width="360"></a><br>
+      <strong>AI 设置</strong><br>
+      <sub>自定义模型、接口地址与连接测试</sub>
+    </td>
+    <td align="center" width="50%">
+      <a href="docs/images/screenshots/chat.png"><img src="docs/images/screenshots/chat.png" alt="AI 聊天窗口" width="360"></a><br>
+      <strong>AI 聊天</strong><br>
+      <sub>对话状态、氛围反馈与记忆参考</sub>
+    </td>
+  </tr>
+</table>
 
-使用其他兼容服务时，请填写服务商提供的接口地址。
+<p align="center"><sub>点击截图可查看原图。</sub></p>
 
-设置窗口会显示当前真正生效的模式和模型；聊天窗口标题下方也会同步显示。模型名称、接口地址和称呼会保存并立即生效，关闭程序后仍会保留。
+API 密钥使用 Windows DPAPI 与当前登录账户绑定加密，不以明文写入配置。也可以使用 `PET_API_KEY` 或 `OPENAI_API_KEY` 环境变量。
 
-API 密钥会使用 Windows DPAPI 与当前登录账户绑定加密，再写入配置文件，不会保存为明文。更换 Windows 账户或把配置复制到其他电脑后，需要重新输入密钥。也可以使用 `PET_API_KEY` 或 `OPENAI_API_KEY` 环境变量。
+> [!IMPORTANT]
+> 启用 AI 后，对话上下文和已启用的记忆会直接发送给你配置的第三方接口；后台补充主动台词缓存也可能产生请求和费用。请只使用可信的 `https://` 接口，并阅读《[隐私说明](PRIVACY.md)》。
 
-接口需要兼容 `POST /v1/chat/completions` 的请求格式。若接口暂时不可用，本条消息会使用离线回复，同时保留 AI 设置并显示具体错误，方便检查模型名称、接口地址或密钥。
+## 记忆、性格与情绪
 
-启用 AI 后，对话上下文和已启用的记忆会直接发送给你配置的第三方接口，后台补充主动台词缓存也可能产生请求和费用。请使用可信的 `https://` 接口，并阅读《[隐私说明](PRIVACY.md)》。
+在右键菜单中选择“记忆与性格”，可以：
 
-## 记忆与性格
-
-右键蕾米埃尔并选择“记忆与性格”，可以：
-
-- 在“神秘共犯”“温柔陪伴”“理性督促”之间切换，也可以补充自己的性格要求。
-- 查看、手动添加或删除长期记忆；聊天中输入 `/记住 内容` 也能直接添加。
-- 开关跨重启记忆，或一次清空长期记忆和最近对话。
+- 切换“神秘共犯”“温柔陪伴”“理性督促”，或填写自定义性格。
+- 查看、手动添加或删除长期记忆；聊天中也可输入 `/记住 内容`。
+- 开关跨重启记忆，清空长期记忆和最近对话。
 - 查看相识天数、对话次数和当前关系阶段。
 
-短期记忆由最近几轮对话组成，长期记忆只从“请记住……”“我喜欢……”“我的目标是……”等明确表达中提取，避免根据只言片语猜测用户信息。模型会自然参考记忆，但被要求不得编造记忆。
+<p align="center">
+  <a href="docs/images/screenshots/memory-management.png"><img src="docs/images/screenshots/memory-management.png" alt="记忆与性格管理" width="620"></a><br>
+  <strong>记忆与性格管理</strong><br>
+  <sub>性格预设、长期记忆、对话次数与关系阶段</sub>
+</p>
 
-对话还会形成轻量的情绪与关系反馈：
+本地情绪识别包括“平静、开心、关心、专注、倦意”，不会额外发起模型请求。关系阶段仅用于调整回复的熟悉程度，不会用冷落、内疚或依赖感要求用户继续互动。
 
-- 情绪包括“平静、开心、关心、专注、倦意”，由用户当前明确表达的语气触发，不进行心理或医学判断。
-- 情绪会随时间逐渐回到平静，并同步改变聊天状态栏、气泡标记与颜色、离线待机台词和模型回复风格。
-- 关系会依次经历“初次相识、逐渐熟悉、亲密伙伴、默契共犯”，只用于调整熟悉程度，不会用冷落、内疚或依赖感要求用户继续互动。
-- 情绪识别在本地完成，不会额外发起模型请求，因此不会增加点击后的等待时间。
+## 问题反馈
 
-记忆保存在本机的 `memory.json` 中。该文件和临时写入文件都已加入 `.gitignore`，不会随代码推送到 GitHub。删除记忆后无法恢复。
+- [报告 Bug](https://github.com/AlphaBuilderF1/remielle-desktop-pet/issues/new?labels=bug&title=%5BBug%5D%20)
+- [提交功能建议](https://github.com/AlphaBuilderF1/remielle-desktop-pet/issues/new?labels=enhancement&title=%5BFeature%5D%20)
+- [查看已有 Issues](https://github.com/AlphaBuilderF1/remielle-desktop-pet/issues)
 
-## 构建 Windows 便携版
+报告问题时，请尽量附上 Windows 版本、复现步骤和错误提示。**请勿公开 API 密钥、`config.json`、`memory.json`、私密对话或未经检查的启动日志。**
 
-构建环境需要 Windows、Python 3.10 或更高版本，以及 PyInstaller：
+## 从源码运行
+
+需要 Windows 与 Python 3.10 或更高版本。克隆仓库后，双击 `启动蕾米埃尔.bat`，或运行：
+
+```powershell
+python main.py
+```
+
+运行基础自检：
+
+```powershell
+python main.py --self-test
+```
+
+### 构建 Windows 便携版
 
 ```powershell
 python -m pip install pyinstaller
 powershell -ExecutionPolicy Bypass -File packaging\build_portable.ps1
 ```
 
-脚本会先运行自检，再生成：
-
-- `release/蕾米埃尔桌宠-v0.3.0-Windows-x64.zip`
-- 同名 `.sha256.txt` 校验文件
-
-便携包不包含 `config.json`、`memory.json`、API 密钥或开发文件。用户数据保存在解压后的程序根目录，升级时可以自行保留。
-
-## 说明
-
-- 便携版运行环境：64 位 Windows 10/11，无需安装 Python。
-- 源码运行环境：Python 3.10 或更高版本。
-- 退出：右键角色，选择“退出”。
-- 设置保存在同目录的 `config.json` 中；API 密钥只以 Windows 账户绑定的加密内容保存，不包含明文密钥。
-- AI 可用时会一次生成并缓存数条主动台词，单击角色可立即显示，缓存不足时会在后台自动补充；没有配置 AI 时使用内置台词。
-- 角色素材由 OpenAI 内置图像生成工具创建，并经过本地透明背景处理。
-- 桌面显示素材已预先使用高质量缩放生成，程序会按原始像素 1:1 显示，避免整数抽样导致的锯齿与模糊。
-- Windows 色键窗口使用专用的二值透明边缘，避免浅色桌面上出现黑色虚线描边。
+构建脚本会先运行自检，再在 `release/` 中生成 ZIP 和对应的 SHA-256 文件。便携包不包含本地配置、记忆、API 密钥或开发文件。
 
 ## 开源、权利与隐私
 
-- 原创源代码使用 [MIT License](LICENSE)。
+- 项目维护者原创的源代码使用 [MIT License](LICENSE)。
 - 角色、名称、商标和 `assets/` 美术素材不在 MIT License 授权范围内，详见 [RIGHTS.md](RIGHTS.md)。
 - 本地数据、AI 接口传输和删除方式详见 [PRIVACY.md](PRIVACY.md)。
 
@@ -96,9 +125,14 @@ powershell -ExecutionPolicy Bypass -File packaging\build_portable.ps1
 - `main.py`：启动入口与基础自检。
 - `remielle_pet/app.py`：桌宠主窗口、点击、拖动、气泡与台词缓存。
 - `remielle_pet/chat.py`：AI 聊天窗口。
-- `remielle_pet/memory.py`：本地长期记忆、最近对话和关系阶段。
+- `remielle_pet/memory.py`：本地记忆、情绪和关系阶段。
 - `remielle_pet/memory_ui.py`：记忆与性格管理窗口。
-- `remielle_pet/settings.py`：设置窗口与连接测试。
-- `remielle_pet/ai.py`：在线请求和离线回复。
+- `remielle_pet/settings.py`：AI 设置与连接测试。
+- `remielle_pet/ai.py`：在线请求与离线回复。
 - `remielle_pet/config.py`、`security.py`：配置读写与 Windows 密钥加密。
-- `archive/`：不参与运行的旧素材、检查图和历史开发工具。
+
+---
+
+<div align="center">
+  如果你喜欢这个项目，欢迎 Star，也欢迎通过 Issues 分享使用体验。
+</div>
