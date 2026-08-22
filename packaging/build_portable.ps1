@@ -67,7 +67,8 @@ if (Test-Path -LiteralPath $ZipPath) { Remove-Item -LiteralPath $ZipPath -Force 
 if (Test-Path -LiteralPath $HashPath) { Remove-Item -LiteralPath $HashPath -Force }
 Compress-Archive -LiteralPath $PackageDir -DestinationPath $ZipPath -CompressionLevel Optimal
 $hash = (Get-FileHash -Algorithm SHA256 -LiteralPath $ZipPath).Hash.ToLowerInvariant()
-"$hash  $PackageName.zip" | Set-Content -LiteralPath $HashPath -Encoding ascii
+$utf8WithoutBom = New-Object System.Text.UTF8Encoding($false)
+[IO.File]::WriteAllText($HashPath, "$hash  $PackageName.zip`r`n", $utf8WithoutBom)
 
 Write-Host "Portable package created:"
 Write-Host $ZipPath
