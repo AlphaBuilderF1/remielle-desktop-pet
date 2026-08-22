@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 使用与隐私说明
+    url: https://github.com/AlphaBuilderF1/remielle-desktop-pet#readme
+    about: 提交前请先查看 README 与隐私说明。
+  - name: 安全问题
+    url: https://github.com/AlphaBuilderF1/remielle-desktop-pet/security/policy
+    about: 敏感安全问题请勿通过公开 Issue 报告。

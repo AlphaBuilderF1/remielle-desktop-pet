@@ -85,9 +85,10 @@ API 密钥使用 Windows DPAPI 与当前登录账户绑定加密，不以明文�
 
 ## 问题反馈
 
-- [报告 Bug](https://github.com/AlphaBuilderF1/remielle-desktop-pet/issues/new?labels=bug&title=%5BBug%5D%20)
-- [提交功能建议](https://github.com/AlphaBuilderF1/remielle-desktop-pet/issues/new?labels=enhancement&title=%5BFeature%5D%20)
+- [报告 Bug](https://github.com/AlphaBuilderF1/remielle-desktop-pet/issues/new?template=bug_report.yml)
+- [提交功能建议](https://github.com/AlphaBuilderF1/remielle-desktop-pet/issues/new?template=feature_request.yml)
 - [查看已有 Issues](https://github.com/AlphaBuilderF1/remielle-desktop-pet/issues)
+- [查看安全政策](SECURITY.md)
 
 报告问题时，请尽量附上 Windows 版本、复现步骤和错误提示。**请勿公开 API 密钥、`config.json`、`memory.json`、私密对话或未经检查的启动日志。**
 
