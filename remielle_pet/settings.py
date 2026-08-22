@@ -27,8 +27,8 @@ class SettingsWindow:
         window = tk.Toplevel(app.root)
         self.window = window
         window.title("蕾米埃尔 · AI 设置")
-        window.geometry("560x560")
-        window.minsize(510, 520)
+        window.geometry("560x640")
+        window.minsize(510, 600)
         window.resizable(True, True)
         window.configure(bg="#f8f3fb")
         window.attributes("-topmost", True)
@@ -97,47 +97,20 @@ class SettingsWindow:
         next_row = 4
         next_row = add_entry(body, "我该怎么称呼你", owner, next_row)
         next_row = add_entry(body, "模型名称", model, next_row)
+        next_row = add_entry(body, "接口地址", base_url, next_row)
         next_row = add_entry(body, "API 密钥", key, next_row, secret=True)
 
         tk.Label(
             body,
-            text="密钥会使用当前 Windows 账户加密保存，不会写入明文。",
+            text=(
+                "密钥会使用当前 Windows 账户加密保存，不会写入明文。\n"
+                "也可以使用环境变量 PET_API_KEY 或 OPENAI_API_KEY。"
+            ),
             bg="#f8f3fb",
             fg="#8a7a92",
             font=("Microsoft YaHei UI", 8),
             justify="left",
         ).grid(row=next_row, column=0, sticky="w", pady=(9, 0))
-        next_row += 1
-
-        advanced_visible = tk.BooleanVar(value=False)
-        advanced_frame = tk.Frame(body, bg="#f8f3fb")
-        advanced_frame.columnconfigure(0, weight=1)
-        add_entry(advanced_frame, "接口地址", base_url, 0)
-        tk.Label(
-            advanced_frame,
-            text="也可以使用环境变量 PET_API_KEY 或 OPENAI_API_KEY。",
-            bg="#f8f3fb",
-            fg="#8a7a92",
-            font=("Microsoft YaHei UI", 8),
-        ).grid(row=2, column=0, sticky="w", pady=(7, 0))
-
-        def toggle_advanced() -> None:
-            if advanced_visible.get():
-                advanced_frame.grid()
-                window.geometry("560x640")
-            else:
-                advanced_frame.grid_remove()
-                window.geometry("560x560")
-
-        ttk.Checkbutton(
-            body,
-            text="显示高级设置",
-            variable=advanced_visible,
-            command=toggle_advanced,
-        ).grid(row=next_row, column=0, sticky="w", pady=(9, 3))
-        next_row += 1
-        advanced_frame.grid(row=next_row, column=0, sticky="ew")
-        advanced_frame.grid_remove()
         next_row += 1
 
         test_status = tk.StringVar(value="")
